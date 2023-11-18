@@ -24,6 +24,15 @@ app.post("/api/users", (req, res) => {
   res.send(users);
 });
 
+// UPDATE
+app.put("/api/users/:id", (req, res) => {
+  const user = users.find((u) => u.id === parseInt(req.params.id));
+  if (!user) return res.status(500).send("このユーザは存在しません");
+
+  user.name = req.body.name;
+  res.send(users);
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
