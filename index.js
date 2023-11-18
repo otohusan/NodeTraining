@@ -1,15 +1,27 @@
 const express = require("express");
 const app = express();
 
-const courses = [
-  { id: 1, name: "computer science" },
-  { id: 2, name: "information technology" },
-  { id: 3, name: "business intelligence" },
+app.use(express.json());
+
+const users = [
+  { id: 1, name: "Maeda Junya" },
+  { id: 2, name: "Ito Ayase" },
+  { id: 3, name: "Kubo Ritsu" },
 ];
 
-//get
-app.get("/api/courses", (req, res) => {
-  res.send(courses);
+//READ
+app.get("/api/users", (req, res) => {
+  res.send(users);
+});
+
+// CREATE
+app.post("/api/users", (req, res) => {
+  const newUser = {
+    id: users.length + 1,
+    name: req.body.name,
+  };
+  users.push(newUser);
+  res.send(users);
 });
 
 const port = process.env.PORT || 3000;
