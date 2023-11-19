@@ -33,6 +33,17 @@ app.put("/api/users/:id", (req, res) => {
   res.send(users);
 });
 
+// DELETE
+app.delete("/api/users/:id", (req, res) => {
+  const user = users.find((u) => u.id === parseInt(req.params.id));
+  if (!user) return res.status(500).send("このユーザは存在しません");
+
+  const index = users.indexOf(user);
+  users.splice(index, 1);
+
+  res.send(users);
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
