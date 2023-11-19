@@ -14,6 +14,12 @@ app.get("/api/users", (req, res) => {
   res.send(users);
 });
 
+//READ
+app.get("/api/users/:id", (req, res) => {
+  const user = users.find((u) => u.id === parseInt(req.params.id));
+  res.send(user);
+});
+
 // CREATE
 app.post("/api/users", (req, res) => {
   const newUser = {
@@ -28,7 +34,6 @@ app.post("/api/users", (req, res) => {
 app.put("/api/users/:id", (req, res) => {
   const user = users.find((u) => u.id === parseInt(req.params.id));
   if (!user) return res.status(500).send("このユーザは存在しません");
-
   user.name = req.body.name;
   res.send(users);
 });
