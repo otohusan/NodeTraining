@@ -7,6 +7,16 @@ const users = [
   { id: 1, name: "Maeda Junya" },
   { id: 2, name: "Ito Ayase" },
   { id: 3, name: "Kubo Ritsu" },
+  { id: 4, name: "Kubo Ritsu" },
+  { id: 5, name: "Kubo Ritsu" },
+  { id: 6, name: "Kubo Ritsu" },
+  { id: 7, name: "Kubo Ritsu" },
+  { id: 8, name: "Kubo Ritsu" },
+  { id: 9, name: "Kubo Ritsu" },
+  { id: 10, name: "Kubo Ritsu" },
+  { id: 11, name: "Kubo Ritsu" },
+  { id: 12, name: "Kubo Ritsu" },
+  { id: 13, name: "Kubo Ritsu" },
 ];
 
 //READ
@@ -14,10 +24,20 @@ app.get("/api/users", (req, res) => {
   res.send(users);
 });
 
-//READ
+//個人のREAD
 app.get("/api/users/:id", (req, res) => {
   const user = users.find((u) => u.id === parseInt(req.params.id));
   res.send(user);
+});
+
+//indexまでの個人のREAD
+app.get("/api/users/portion/:index", (req, res) => {
+  const index = parseInt(req.params.index);
+
+  const usersByIndex = users.slice(0, index);
+  if (index > users.length) return res.status(500).send("indexが大きすぎます");
+
+  res.send(usersByIndex);
 });
 
 // CREATE
