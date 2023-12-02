@@ -53,16 +53,13 @@ const followers = [
   { userId: 10, followerId: 2 },
 ];
 
+con.connect(function (err) {
+  if (err) return res.status(500).send("データベースに接続できません");
+});
+
 //READ
 app.get("/api/users", (req, res) => {
-  con.connect(function (err) {
-    if (err) return res.status(500).send("データベースに接続できません");
-    const sql = "select * from users";
-    con.query(sql, function (err, result, fields) {
-      if (err) return res.status(500).send("データを取得できません");
-      res.send(result);
-    });
-  });
+  res.send(users);
 });
 
 // 試すとこ
