@@ -1,7 +1,17 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
+const mysql = require("mysql");
 
 app.use(express.json());
+
+// 接続するMySQLの情報
+const con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: process.env.DB_PASS,
+  database: "NodeTraining",
+});
 
 const users = [
   { id: 1, name: "Maeda Junya" },
@@ -45,7 +55,14 @@ const followers = [
 
 //READ
 app.get("/api/users", (req, res) => {
-  res.send(users);
+  con.connect(function (err) {
+    if (err) return res.status(500).send("データベースに接続できません");
+    const sql = "select * from users";
+    con.query(sql, function (err, result, fields) {
+      if (err) return res.status(500).send("データを取得できません");
+      res.send(result);
+    });
+  });
 });
 
 // 試すとこ
