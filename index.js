@@ -53,15 +53,38 @@ const followers = [
   { userId: 10, followerId: 2 },
 ];
 
+con.connect(function (err) {
+  if (err) return res.status(500).send("データベースに接続できません");
+});
+
 //READ
 app.get("/api/users", (req, res) => {
-  con.connect(function (err) {
-    if (err) return res.status(500).send("データベースに接続できません");
-    const sql = "select * from users";
-    con.query(sql, function (err, result, fields) {
-      if (err) return res.status(500).send("データを取得できません");
-      res.send(result);
-    });
+  const sql = "select * from users";
+  con.query(sql, function (err, result, fields) {
+    if (err) return res.status(500).send("データを取得できません");
+    res.send(result);
+  });
+});
+
+function returnUsers(res) {
+  const sql = "SELECT * FROM users";
+  con.query(sql, function (err, result, fields) {
+    if (err) return res.status(500).send("データを取得できません");
+    res.send(result);
+  });
+}
+
+// CREATE
+app.post("/api/users", (req, res) => {
+  const userName = req.body.name;
+  if (!userName) {
+    return res.status(400).send("名前を入力してください");
+  }
+
+  const sql = "INSERT INTO users (name) VALUES (?)";
+  con.query(sql, [userName], (err, result) => {
+    if (err) return res.status(500).send("データを追加できません");
+    returnUsers(res); // 新しいユーザーが追加された後にユーザーリストを返す
   });
 });
 
@@ -100,16 +123,6 @@ app.get("/api/users/portion/:index", (req, res) => {
   if (index > users.length) return res.status(500).send("indexが大きすぎます");
 
   res.send(usersByIndex);
-});
-
-// CREATE
-app.post("/api/users", (req, res) => {
-  const newUser = {
-    id: users.length + 1,
-    name: req.body.name,
-  };
-  users.push(newUser);
-  res.send(users);
 });
 
 // UPDATE
