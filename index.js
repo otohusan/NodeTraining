@@ -19,15 +19,60 @@ const users = [
   { id: 13, name: "Kubo Ritsu" },
 ];
 
+const followers = [
+  { userId: 1, followerId: 2 },
+  { userId: 1, followerId: 4 },
+  { userId: 1, followerId: 7 },
+  { userId: 2, followerId: 1 },
+  { userId: 3, followerId: 5 },
+  { userId: 4, followerId: 8 },
+  { userId: 5, followerId: 4 },
+  { userId: 6, followerId: 1 },
+  { userId: 7, followerId: 8 },
+  { userId: 8, followerId: 9 },
+  { userId: 9, followerId: 3 },
+  { userId: 10, followerId: 11 },
+  { userId: 12, followerId: 3 },
+  { userId: 13, followerId: 8 },
+  { userId: 4, followerId: 1 },
+  { userId: 6, followerId: 7 },
+  { userId: 5, followerId: 7 },
+  { userId: 2, followerId: 9 },
+  { userId: 8, followerId: 5 },
+  { userId: 9, followerId: 4 },
+  { userId: 10, followerId: 2 },
+];
+
 //READ
 app.get("/api/users", (req, res) => {
   res.send(users);
+});
+
+// 試すとこ
+app.get("/api/users/type", (req, res) => {
+  const type = typeof [2, 3, 4];
+  if (!type) res.status(500).send("errorだね");
+
+  res.send(type);
 });
 
 //個人のREAD
 app.get("/api/users/:id", (req, res) => {
   const user = users.find((u) => u.id === parseInt(req.params.id));
   res.send(user);
+});
+
+// 指定したidのfollower情報を取得のREAD
+app.get("/api/users/:id/follower", (req, res) => {
+  const userFollowers = followers.filter(
+    (f) => f.userId === parseInt(req.params.id)
+  );
+  const followerList = userFollowers.map((f) => {
+    const user = users.find((u) => u.id === f.followerId);
+    return user ? user : null;
+  });
+
+  res.send(followerList);
 });
 
 //indexまでの個人のREAD
@@ -67,6 +112,11 @@ app.delete("/api/users/:id", (req, res) => {
   users.splice(index, 1);
 
   res.send(users);
+});
+
+// 存在しないエンドポイントにアクセスしたとき
+app.use((req, res, next) => {
+  res.status(404).send("404 - Not Found");
 });
 
 const port = process.env.PORT || 3000;
