@@ -66,6 +66,7 @@ app.get("/api/users", (req, res) => {
   });
 });
 
+// 変更を確認するための関数
 function returnUsers(res) {
   const sql = "SELECT * FROM users";
   con.query(sql, function (err, result, fields) {
@@ -73,6 +74,23 @@ function returnUsers(res) {
     res.send(result);
   });
 }
+
+//個人のREAD
+app.get("/api/users/:id", (req, res) => {
+  const userId = req.params.id;
+  const sql = "SELECT * FROM users WHERE id = (?)";
+
+  con.query(sql, [userId], (err, result) => {
+    if (err) {
+      return res.status(500).send("データを取得できません");
+    }
+    if (result.length > 0) {
+      res.send(result[0]); // ユーザーデータを送信
+    } else {
+      res.status(404).send("ユーザーが見つかりません"); // ユーザーが見つからない場合
+    }
+  });
+});
 
 // CREATE
 app.post("/api/users", (req, res) => {
@@ -86,43 +104,6 @@ app.post("/api/users", (req, res) => {
     if (err) return res.status(500).send("データを追加できません");
     returnUsers(res); // 新しいユーザーが追加された後にユーザーリストを返す
   });
-});
-
-// 試すとこ
-app.get("/api/users/type", (req, res) => {
-  const type = typeof [2, 3, 4];
-  if (!type) res.status(500).send("errorだね");
-
-  res.send(type);
-});
-
-//個人のREAD
-app.get("/api/users/:id", (req, res) => {
-  const user = users.find((u) => u.id === parseInt(req.params.id));
-  res.send(user);
-});
-
-// 指定したidのfollower情報を取得のREAD
-app.get("/api/users/:id/follower", (req, res) => {
-  const userFollowers = followers.filter(
-    (f) => f.userId === parseInt(req.params.id)
-  );
-  const followerList = userFollowers.map((f) => {
-    const user = users.find((u) => u.id === f.followerId);
-    return user ? user : null;
-  });
-
-  res.send(followerList);
-});
-
-//indexまでの個人のREAD
-app.get("/api/users/portion/:index", (req, res) => {
-  const index = parseInt(req.params.index);
-
-  const usersByIndex = users.slice(0, index);
-  if (index > users.length) return res.status(500).send("indexが大きすぎます");
-
-  res.send(usersByIndex);
 });
 
 // UPDATE
@@ -152,4 +133,35 @@ app.use((req, res, next) => {
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
+});
+
+// 試すとこ
+app.get("/api/users/type", (req, res) => {
+  const type = typeof [2, 3, 4];
+  if (!type) res.status(500).send("errorだね");
+
+  res.send(type);
+});
+
+// 指定したidのfollower情報を取得のREAD
+app.get("/api/users/:id/follower", (req, res) => {
+  const userFollowers = followers.filter(
+    (f) => f.userId === parseInt(req.params.id)
+  );
+  const followerList = userFollowers.map((f) => {
+    const user = users.find((u) => u.id === f.followerId);
+    return user ? user : null;
+  });
+
+  res.send(followerList);
+});
+
+//indexまでの個人のREAD
+app.get("/api/users/portion/:index", (req, res) => {
+  const index = parseInt(req.params.index);
+
+  const usersByIndex = users.slice(0, index);
+  if (index > users.length) return res.status(500).send("indexが大きすぎます");
+
+  res.send(usersByIndex);
 });
