@@ -145,16 +145,23 @@ app.delete("/api/users/:id", (req, res) => {
 });
 
 // 指定したidのfollower情報を取得のREAD
-app.get("/api/users/:id/follower", (req, res) => {
-  const userFollowers = followers.filter(
-    (f) => f.userId === parseInt(req.params.id)
-  );
-  const followerList = userFollowers.map((f) => {
-    const user = users.find((u) => u.id === f.followerId);
-    return user ? user : null;
-  });
+app.get("/api/users/:id/followers", (req, res) => {
+  const userId = parseInt(req.params.id);
 
-  res.send(followerList);
+  // followers テーブルと users テーブルを結合してフォロワー情報を取得
+  const sql = `
+    SELECT users.* 
+    FROM users 
+    INNER JOIN followers ON users.id = followers.follower_id 
+    WHERE followers.following_id = ?
+  `;
+
+  con.query(sql, [userId], (err, result) => {
+    if (err) {
+      return res.status(500).send("データを取得できません");
+    }
+    res.send(result);
+  });
 });
 
 //indexまでの個人のREAD
