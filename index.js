@@ -10,7 +10,7 @@ const con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: process.env.DB_PASS,
-  database: "NodeTraining",
+  database: process.env.DB_NAME,
 });
 
 const users = [
@@ -108,21 +108,40 @@ app.post("/api/users", (req, res) => {
 
 // UPDATE
 app.put("/api/users/:id", (req, res) => {
-  const user = users.find((u) => u.id === parseInt(req.params.id));
-  if (!user) return res.status(500).send("このユーザは存在しません");
-  user.name = req.body.name;
-  res.send(users);
+  const userId = parseInt(req.params.id);
+  const userName = req.body.name;
+
+  // 入力値の検証
+  if (!userName) {
+    return res.status(400).send("ユーザー名が指定されていません");
+  }
+
+  const sql = "UPDATE users SET name = ? WHERE id = ?";
+  con.query(sql, [userName, userId], (err, result) => {
+    if (err) {
+      return res.status(500).send("ユーザーの更新中にエラーが発生しました");
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).send("このユーザは存在しません");
+    }
+    returnUsers(res);
+  });
 });
 
 // DELETE
 app.delete("/api/users/:id", (req, res) => {
-  const user = users.find((u) => u.id === parseInt(req.params.id));
-  if (!user) return res.status(500).send("このユーザは存在しません");
+  const userId = parseInt(req.params.id);
 
-  const index = users.indexOf(user);
-  users.splice(index, 1);
-
-  res.send(users);
+  const sql = "DELETE FROM users WHERE id = ?";
+  con.query(sql, [userId], (err, result) => {
+    if (err) {
+      return res.status(500).send("ユーザーの削除中にエラーが発生しました");
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).send("このユーザは存在しません");
+    }
+    returnUsers(res);
+  });
 });
 
 // 存在しないエンドポイントにアクセスしたとき
