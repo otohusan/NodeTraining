@@ -57,15 +57,6 @@ con.connect(function (err) {
   if (err) return res.status(500).send("データベースに接続できません");
 });
 
-//READ
-app.get("/api/users", (req, res) => {
-  const sql = "select * from users";
-  con.query(sql, function (err, result, fields) {
-    if (err) return res.status(500).send("データを取得できません");
-    res.send(result);
-  });
-});
-
 // 変更を確認するための関数
 function returnUsers(res) {
   const sql = "SELECT * FROM users";
@@ -74,6 +65,23 @@ function returnUsers(res) {
     res.send(result);
   });
 }
+
+function returnFollowers(res) {
+  const sql = "SELECT * FROM followers";
+  con.query(sql, function (err, result, fields) {
+    if (err) return res.status(500).send("データを取得できません");
+    res.send(result);
+  });
+}
+
+//READ
+app.get("/api/users", (req, res) => {
+  const sql = "select * from users";
+  con.query(sql, function (err, result, fields) {
+    if (err) return res.status(500).send("データを取得できません");
+    res.send(result);
+  });
+});
 
 //個人のREAD
 app.get("/api/users/:id", (req, res) => {
@@ -161,6 +169,24 @@ app.get("/api/users/:id/followers", (req, res) => {
       return res.status(500).send("データを取得できません");
     }
     res.send(result);
+  });
+});
+
+// followを可能にするAPI
+app.post("/api/users/:id/follow", (req, res) => {
+  const follower_id = parseInt(req.params.id);
+  const following_id = parseInt(req.body.following_id);
+
+  if (!following_id) {
+    return res.status(400).send("following_idが存在しません");
+  }
+
+  const sql = "INSERT INTO followers (follower_id, following_id) VALUES (?, ?)";
+  con.query(sql, [follower_id, following_id], (err, result) => {
+    if (err) {
+      return res.status(500).send("フォロー中にエラーが起きました");
+    }
+    returnFollowers(res);
   });
 });
 
