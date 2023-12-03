@@ -144,24 +144,6 @@ app.delete("/api/users/:id", (req, res) => {
   });
 });
 
-// 存在しないエンドポイントにアクセスしたとき
-app.use((req, res, next) => {
-  res.status(404).send("404 - Not Found");
-});
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
-
-// 試すとこ
-app.get("/api/users/type", (req, res) => {
-  const type = typeof [2, 3, 4];
-  if (!type) res.status(500).send("errorだね");
-
-  res.send(type);
-});
-
 // 指定したidのfollower情報を取得のREAD
 app.get("/api/users/:id/follower", (req, res) => {
   const userFollowers = followers.filter(
@@ -179,8 +161,21 @@ app.get("/api/users/:id/follower", (req, res) => {
 app.get("/api/users/portion/:index", (req, res) => {
   const index = parseInt(req.params.index);
 
-  const usersByIndex = users.slice(0, index);
-  if (index > users.length) return res.status(500).send("indexが大きすぎます");
+  const sql = "SELECT * FROM users WHERE id <= ?";
+  con.query(sql, [index], (err, result) => {
+    if (err) {
+      return res.status(500).send("ユーザーの取得中にエラーが起きました");
+    }
+    res.send(result);
+  });
+});
 
-  res.send(usersByIndex);
+// 存在しないエンドポイントにアクセスしたとき
+app.use((req, res, next) => {
+  res.status(404).send("404 - Not Found");
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
