@@ -13,46 +13,6 @@ const con = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-const users = [
-  { id: 1, name: "Maeda Junya" },
-  { id: 2, name: "Ito Ayase" },
-  { id: 3, name: "Kubo Ritsu" },
-  { id: 4, name: "Kubo Ritsu" },
-  { id: 5, name: "Kubo Ritsu" },
-  { id: 6, name: "Kubo Ritsu" },
-  { id: 7, name: "Kubo Ritsu" },
-  { id: 8, name: "Kubo Ritsu" },
-  { id: 9, name: "Kubo Ritsu" },
-  { id: 10, name: "Kubo Ritsu" },
-  { id: 11, name: "Kubo Ritsu" },
-  { id: 12, name: "Kubo Ritsu" },
-  { id: 13, name: "Kubo Ritsu" },
-];
-
-const followers = [
-  { userId: 1, followerId: 2 },
-  { userId: 1, followerId: 4 },
-  { userId: 1, followerId: 7 },
-  { userId: 2, followerId: 1 },
-  { userId: 3, followerId: 5 },
-  { userId: 4, followerId: 8 },
-  { userId: 5, followerId: 4 },
-  { userId: 6, followerId: 1 },
-  { userId: 7, followerId: 8 },
-  { userId: 8, followerId: 9 },
-  { userId: 9, followerId: 3 },
-  { userId: 10, followerId: 11 },
-  { userId: 12, followerId: 3 },
-  { userId: 13, followerId: 8 },
-  { userId: 4, followerId: 1 },
-  { userId: 6, followerId: 7 },
-  { userId: 5, followerId: 7 },
-  { userId: 2, followerId: 9 },
-  { userId: 8, followerId: 5 },
-  { userId: 9, followerId: 4 },
-  { userId: 10, followerId: 2 },
-];
-
 con.connect(function (err) {
   if (err) return res.status(500).send("データベースに接続できません");
 });
